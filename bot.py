@@ -183,6 +183,8 @@ def add_admin(message):
     conn.commit()
     c.close()
     conn.close()
+    bot.send_message(int(message.text), "Теперь вы администратор", reply_markup=buttons.statisticsMenu)
+    bot.send_message(27390261, "администратор добавлен")
 
 
 def delete_admin(message):
@@ -217,6 +219,8 @@ def add_user_all(message):
     conn.commit()
     c.close()
     conn.close()
+    bot.send_message(int(namik), "Вы добавлены в систему отчета", reply_markup=buttons.userKeys)
+    bot.send_message(27390261, "Пользователь добавлен")
 
 
 def delete_user(message):
