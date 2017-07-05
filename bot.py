@@ -152,22 +152,27 @@ def main_desk(message):
 
 
 
+@bot.message_handler(regexp="Добавить пользователя")
+def decor(message):
+    msg = bot.send_message(message.chat.id, "Укажите id пользователя, которого надо добавить")
+    bot.register_next_step_handler(msg, add_user_1)
+
+@bot.message_handler(regexp="Добавить администратора")
+def decor(message):
+    msg = bot.send_message(message.chat.id, "Укажите id администратора, которого надо добавить")
+    bot.register_next_step_handler(msg, add_admin)
 
 
+@bot.message_handler(regexp="Удалить администратора")
+def decor(message):
+    msg = bot.send_message(message.chat.id, "Укажите его id, которого надо удалить")
+    bot.register_next_step_handler(msg, delete_admin)
 
-def choose(message):
-    if message.text == "Добавить администратора":
-        msg = bot.send_message(message.chat.id, "Укажите id администратора, которого надо добавить")
-        bot.register_next_step_handler(msg, add_admin)
-    if message.text == "Удалить администратора":
-        msg = bot.send_message(message.chat.id, "Укажите его id, которого надо удалить")
-        bot.register_next_step_handler(msg, delete_admin)
-    if message.text == "Добавить пользователя":
-        msg = bot.send_message(message.chat.id, "Укажите id пользователя, которого надо добавить")
-        bot.register_next_step_handler(msg, add_user_1)
-    if message.text == "Удалить пользователя":
-        msg = bot.send_message(message.chat.id, "Укажите id пользователя, которого надо удалить")
-        bot.register_next_step_handler(msg, delete_user)
+
+@bot.message_handler(regexp="Удалить пользователя")
+def decor(message):
+    msg = bot.send_message(message.chat.id, "Укажите id пользователя, которого надо удалить")
+    bot.register_next_step_handler(msg, delete_user)
 
 
 def add_admin(message):
@@ -196,7 +201,6 @@ def add_user_1(message):
     conn = sqlite3.connect('my.sqlite')
     c = conn.cursor()
     conn.commit()
-    # c.execute('INSERT INTO users(id) VALUES(' + message.text + ')')
     c.execute("INSERT INTO users(id) VALUES('%s')" % message.text )
     conn.commit()
     c.close()
