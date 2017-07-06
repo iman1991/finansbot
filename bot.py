@@ -17,10 +17,13 @@ def main_admin_desk(message):
         bot.send_message(message.chat.id, "Выберите действие", reply_markup=buttons.adminMenu)
         conn = sqlite3.connect('my.sqlite')
         c = conn.cursor()
+        c.execute('SELECT * FROM users')
+        s = ""
+        for raw in c.fetchall():
+            s = "%sID=%s, имя %s статус %s \n" % (s, raw[0], raw[1], raw[2])
+        if s != "":
+            bot.send_message(message.chat.id, s, reply_markup=buttons.adminMenu)
         conn.commit()
-        c.execute('SELECT * FROM users where admin = 1')
-        conn.commit()
-
         c.close()
         conn.close()
     else:
