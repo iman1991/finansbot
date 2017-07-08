@@ -259,22 +259,111 @@ def output(message):
 
 
 def db_take1(message):
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    keyboard.add('База Домалогика', 'База Производство', 'От Клиента')
     global cash_count_take
     cash_count_take = message.text
-    msg = bot.send_message(message.chat.id, "От кого вы получили средства?")
+    msg = bot.send_message(message.chat.id, "От кого вы получили средства?", reply_markup=keyboard)
     bot.register_next_step_handler(msg, db_take2)
 
 
 def db_take2(message):
-    tday = datetime.date.today()
-    tdelta = datetime.timedelta()
-    bot.send_message(message.chat.id, "Отлично, данные о получении " + cash_count_take + " р. были отправлены в базу данных")
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     conn = sqlite3.connect('my.sqlite')
     c = conn.cursor()
-    c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (message.chat.id, message.chat.first_name, "Кредит", cash_count_take, message.text, tday-tdelta, "1"))
+    conn.commit()
+    keyboard.add('Расчетный счет', 'Наличные Хасай', 'Наличиные Магомед', 'Касса в Сбербанке')
+
+    if message.text == 'База Домалогика':
+        msg = bot.send_message(message.chat.id,"Выберите способ получения средств", reply_markup=keyboard)
+        bot.register_next_step_handler(msg, domalogika)
+
+    if message.text == 'База Производство':
+        msg = bot.send_message(message.chat.id,"Выберите способ получения средств", reply_markup=keyboard)
+        bot.register_next_step_handler(msg, factory)
+
+    if message.text == 'От Клиента':
+        msg = bot.send_message(message.chat.id, "Введите имя клиента")
+        bot.register_next_step_handler(msg, client)
+    c.close()
+    conn.close()
+
+
+
+def factory(message):
+    tday = datetime.date.today()
+    tdelta = datetime.timedelta()
+    conn = sqlite3.connect('my.sqlite')
+    c = conn.cursor()
+
+    if message.text == 'Расчетный счет':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take, "База Производство, "+ str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id, "Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Наличные Хасай':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Наличиные Магомед':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Касса в Сбербанке':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
     conn.commit()
     c.close()
     conn.close()
+
+
+
+def domalogika(message):
+    tday = datetime.date.today()
+    tdelta = datetime.timedelta()
+    conn = sqlite3.connect('my.sqlite')
+    c = conn.cursor()
+
+    if message.text == 'Расчетный счет':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take, "База Домалогика, "+ str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id, "Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Наличные Хасай':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Наличиные Магомед':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+
+    if message.text == 'Касса в Сбербанке':
+        c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
+            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+        bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
+    conn.commit()
+    c.close()
+    conn.close()
+
+
+
+def client(message):
+    tday = datetime.date.today()
+    tdelta = datetime.timedelta()
+    conn = sqlite3.connect('my.sqlite')
+    c = conn.cursor()
+    take_client = message.text
+    bot.send_message(message.chat.id,"Отлично, данные о получении " + cash_count_take + " р. были отправлены в базу данных")
+    c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (message.chat.id, message.chat.first_name, "Кредит", cash_count_take, take_client, tday - tdelta, "1"))
+    conn.commit()
+    c.close()
+    conn.close()
+
 
 
 def db_give(message):
