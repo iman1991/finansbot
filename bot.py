@@ -19,7 +19,7 @@ def main_admin_desk(message):
         c.execute('SELECT * FROM users')
         s = ""
         for raw in c.fetchall():
-            s = "%sID=%s, имя %s статус %s \n" % (s, raw[0], raw[1], raw[2])
+            s = "{}ID=%s, имя {} статус {}\n".format(s, raw[0], raw[1], raw[2])
         if s != "":
             bot.send_message(message.chat.id, s, reply_markup=buttons.adminMenu)
         utility.BDClosse(conn, c)
@@ -47,12 +47,12 @@ def myStatistic(message):
     bot.send_message(message.chat.id, "----Получено----")
 
     for row in c:
-        bot.send_message(message.chat.id, "Кто получил: " + str(row[1]) + "\nТип тразакции: #" + str(row[2]) + "\nСумма: " + str(row[3]) + "\nОписание товара: " + str(row[4]) + "\nДата: " + str(row[5]))
+        bot.send_message(message.chat.id, utility.boardText(row))
     c.execute("SELECT * FROM trans WHERE id = %s and num = 0 " % message.chat.id )
 
     bot.send_message(message.chat.id, "----Потрачено----")
     for row in c:
-        bot.send_message(message.chat.id, "Кто получил: " + str(row[1]) + "\nТип тразакции: #" + str(row[2]) + "\nСумма: " + str(row[3]) + "\nОт кого получил: " + str(row[4]) + "\nДата: " + str(row[5]))
+        bot.send_message(message.chat.id, utility.boardText(row))
 
     utility.BDClosse(conn, c)
 
