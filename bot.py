@@ -12,7 +12,16 @@ bot = telebot.TeleBot(token=config.token)
 
 
 @bot.message_handler(commands = ['start'])
+@bot.message_handler(regexp="Назад")
 def main_admin_desk(message):
+    if message.chat.id == 27390261:
+        bot.send_message(message.chat.id, "Hi, Boss", reply_markup=buttons.main_menu)
+    else:
+        main_desk(message)
+
+
+@bot.message_handler(regexp="Управление")
+def roots(message):
     if message.chat.id == 27390261:
         bot.send_message(message.chat.id, "Выберите действие", reply_markup=buttons.main_menu)
         conn, c = utility.BDConn()
@@ -23,8 +32,6 @@ def main_admin_desk(message):
         if s != "":
             bot.send_message(message.chat.id, s, reply_markup=buttons.adminMenu)
         utility.BDClosse(conn, c)
-    else:
-        main_desk(message)
 
 
 @bot.message_handler(regexp="Получил деньги")
@@ -96,6 +103,7 @@ def statAll(message):
             bot.send_message(message.chat.id, utility.boardText(row))
     utility.BDClosse(conn, c)
 
+
 @bot.message_handler(regexp="Статистика по работникам")
 def specific_employee(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=0.5, resize_keyboard=True)
@@ -108,8 +116,8 @@ def specific_employee(message):
     bot.register_next_step_handler(msg, output)
 
 
+@bot.message_handler(regexp="Работа")
 def main_desk(message):
-
     conn, c = utility.BDConn()
     resc = 0
     c.execute("SELECT id FROM users WHERE admin = 1 and id = :id ", ({"id": str(message.from_user.id)}))
@@ -154,6 +162,8 @@ def decor(message):
 def decor(message):
     msg = bot.send_message(message.chat.id, "Укажите id пользователя, которого надо удалить")
     bot.register_next_step_handler(msg, delete_user)
+
+
 
 
 def add_admin(message):
