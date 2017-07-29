@@ -107,8 +107,9 @@ def statAll(message):
 @bot.message_handler(regexp="Статистика по работникам")
 def specific_employee(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=0.5, resize_keyboard=True)
-    conn , c = utility.BDConn()
+    conn, c = utility.BDConn()
     c.execute('SELECT * FROM users')
+    keyboard.add('Назад')
     for row in c:
         keyboard.add(row[1])
     msg = bot.send_message(message.chat.id, "Выберите работника: ", reply_markup=keyboard)
@@ -206,8 +207,8 @@ def delete_user(message):
 
 def cash_messages(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    keyboard.add('Получил деньги', 'Потратил деньги', 'Посмотреть свою статистику')
-    bot.send_message(message.chat.id, "Ввидите команду", reply_markup=keyboard)
+    keyboard.add('Получил деньги', 'Потратил деньги', 'Посмотреть свою статистику','/start')
+    bot.send_message(message.chat.id, "Введите команду", reply_markup=keyboard)
 
 
 def output(message):
@@ -220,12 +221,25 @@ def output(message):
     c.execute('SELECT * FROM trans WHERE uin = ? and num = ?', (message.text, '0'))
     for row in c:
         bot.send_message(message.chat.id, utility.boardText(row))
+    bot.send_message(message.chat.id, "---Общий доход средств---")
+    c.execute('SELECT * FROM trans WHERE uin = ? and num = ?', (message.text, '0'))
+    sum = 0
+    for row in c:
+        sum = sum + row[3]
+    bot.send_message(message.chat.id, "Данный пользователь получил сумму " + str(sum) + " руб." + " за все произведенные им транзакции " )
+    c.execute('SELECT * FROM trans WHERE uin = ? and num = ?', (message.text, '1'))
+    bot.send_message(message.chat.id, "---Общий расход средств---")
+    sum = 0
+    for row in c:
+        sum = sum + row[3]
+    bot.send_message(message.chat.id,
+                     "Данный пользователь потратил сумму " + str(sum) + " руб." + " за все произведенные им транзакции ")
     utility.BDClosse(conn, c)
 
 
 def db_take1(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    keyboard.add('База Домалогика', 'База Производство', 'От Клиента')
+    keyboard.add('База Домалогика', 'База Производство', 'От Клиента', '/start')
     global cash_count_take
     cash_count_take = message.text
     msg = bot.send_message(message.chat.id, "От кого вы получили средства?", reply_markup=keyboard)
@@ -253,22 +267,22 @@ def factory(message):
     conn, c = utility.BDConn()
     if message.text == 'Расчетный счет':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take, "База Производство, "+ str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take, "База Производство, "+ str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id, "Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Наличные Хасай':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Наличиные Магомед':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Касса в Сбербанке':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Производство, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
     utility.BDClosse(conn, c)
 
@@ -281,22 +295,22 @@ def domalogika(message):
 
     if message.text == 'Расчетный счет':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take, "База Домалогика, "+ str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take, "База Домалогика, "+ str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id, "Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Наличные Хасай':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Наличиные Магомед':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
 
     if message.text == 'Касса в Сбербанке':
         c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)", (
-            message.chat.id, message.chat.first_name, "Кредит", cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
+            message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take,"База Домалогика, " + str(message.text), tday - tdelta, "1"))
         bot.send_message(message.chat.id,"Отлично данные о получении " + cash_count_take + " р. были отправлены  в базу данных")
     utility.BDClosse(conn, c)
 
@@ -310,7 +324,7 @@ def client(message):
     take_client = message.text
     bot.send_message(message.chat.id,"Отлично, данные о получении " + cash_count_take + " р. были отправлены в базу данных")
     c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)",
-              (message.chat.id, message.chat.first_name, "Кредит", cash_count_take, take_client, tday - tdelta, "1"))
+              (message.chat.id, message.chat.first_name, "Кредит, ID:" + str(message.chat.id), cash_count_take, take_client, tday - tdelta, "1"))
     utility.BDClosse(conn, c)
 
 
@@ -327,7 +341,7 @@ def db_give2(message):
     bot.send_message(message.chat.id, "Отлично, данные о рaстрате " + cash_count_give + " р. были отправены в базу данных")
     conn, c = utility.BDConn()
     c.execute("INSERT INTO trans(id, uin, trans, sum, description, time, num) VALUES(?,?,?,?,?,?,?)",
-              (message.chat.id, message.chat.first_name, "Дебет", cash_count_give, message.text, tday-tdelta, "0"))
+              (message.chat.id, message.chat.first_name, "Дебет, ID:" + str(message.chat.id), cash_count_give, message.text, tday-tdelta, "0"))
     utility.BDClosse(conn, c)
 
 if __name__ == '__main__':
